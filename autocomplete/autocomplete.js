@@ -6,66 +6,41 @@
     var options = $.extend( {}, $.fn.autocomplete.options, settings );
 
     function align(input, element) {
-      var offset = input[0].getBoundingClientRect();
-      var scrollTop;
-      if (document.documentElement) {
-        if (document.documentElement.scrollTop != 0) {
-          scrollTop = document.documentElement.scrollTop;
-        } else {
-          scrollTop = document.body.scrollTop;
-        }
-      } else {
-        scrollTop = document.body.scrollTop;
-      }
-      element.css({
-        position: 'absolute',
-        top: offset.top + offset.height + scrollTop,
-        left: offset.left,
-        minWidth: offset.width - 24,
-        maxWidth: input.closest('form').width(),
-        zIndex: 5000
-      });
+        offset = input.offset();
+        height = input.outerHeight();
+        width = input.outerWidth();
+        element.css({
+            position: 'absolute',
+            top: offset.top + height + "px",
+            left: offset.left + "px",
+            minWidth: width - 24,
+            maxWidth: input.closest('form').width(),
+            zIndex: 5000
+        });
     }
 
-    function populate(value, input, eventType, clickedResult, clickedResultId) {
-      input.val(value);
-      $.fn.autocomplete.element.hide();
-      input.trigger('autocomplete:select', {value: value, eventType: eventType});
+    function populate(value, input, eventType) {
+        input.val(value);
+        $.fn.autocomplete.element.hide();
+        input.trigger('autocomplete:select', {value: value, eventType: eventType});
       
-      if (clickedResult) {
-          var href = jQuery( '#'+clickedResultId ).attr( 'href' );
-          window.location.href = href;
-          return false;
-      }
-      
-      $( '.searchForm' ).submit();
+        if($.fn.autocomplete.options.autoSubmit === true) {
+            input.closest('form').submit();
+        }
     }
 
-    function createListFrom(shell, input, data, category, main, searchType) {
-
-        if (main) {
-            shell.append($('<div/>')
-                .addClass('autocomplete-results-category-main')
-                .html(category)
-            );
-        } else {
-            shell.append($('<div/>')
-                .addClass('autocomplete-results-category')
-                .html(category)
-            );
-        }
-
+    function createListFrom(shell, input, data, category) {
+        shell.append($('<div/>')
+            .addClass('autocomplete-results-category')
+            .html(category)
+        );
         var length = Math.min(options.maxResults, data.length);
         input.data('length', length);
         for (var i=0; i<length; i++) {
           if (typeof data[i] === 'string') {
-            data[i] = {val: data[i]};
+            data[i] = {value: data[i]};
           }
-          var content = data[i].val;
-          var searchUrlType = (searchType == 'Libraries_towns') ? 'Libraries' : searchType;
-          data[i].href = '/Search/Results?lookfor0[]='
-                        + encodeURIComponent(content).replace("/\+/g", "%20")
-                        + '&type0[]='+searchUrlType+'&limit=10&sort=relevance&searchTypeTemplate=basic&bool0[]=AND&join=AND';
+          var content = data[i].value;
           if (options.highlight) {
             // escape term for regex
             // https://github.com/sindresorhus/escape-string-regexp/blob/master/index.js
@@ -73,12 +48,10 @@
             var regex = new RegExp('('+escapedTerm+')', 'ig');
             content = content.replace(regex, '<b>$1</b>');
           }
-          var item = typeof data[i].href === 'undefined'
-            ? $('<div/>')
-            : $('<a/>').attr('href', data[i].href);
+          var item = $('<div/>');
           item.attr('data-index', i+0)
-              .attr('data-value', data[i].val)
-              .attr('id', searchType+i)
+              .attr('data-value', data[i].value)
+              .attr('id', 'autocomplete-item-' + i)
               .addClass('item')
               .html(content)
               .mouseover(function() {
@@ -93,73 +66,24 @@
         }
     }
     
-    function createTitlesListFrom(shell, input, data, category, main) {
-        createListFrom(shell, input, data, 'in_titles', false, 'adv_search_title_series');
-    }
-    
-    function createAuthorsListFrom(shell, input, data, category, main) {
-        createListFrom(shell, input, data, 'in_authors', false, 'adv_search_author_corporation');
-    }
-    
-    function createSubjectsListFrom(shell, input, data, category, main) {
-        createListFrom(shell, input, data, 'in_subjects', false, 'adv_search_subject_keywords');
-    }
-
-    function createLibNamesListFrom(shell, input, data, category, main) {
-        createListFrom(shell, input, data, 'in_lib_names', false, 'Libraries');
-    }
-
-    function createTownsListFrom(shell, input, data, category, main) {
-        createListFrom(shell, input, data, 'in_towns', false, 'Libraries_towns');
-    }
-
     function createList(data, input) {
-      var shell = $('<div/>');
-      var type = $('#librariesSearchLink').hasClass('active') ? 'Libraries' : '';
-
-      if (type == 'Libraries') {
-        if((data.byLibName.length > 0) || (data.byTown.length > 0)) {
-            createListFrom(shell, input, {}, 'The most commonly occurring:', true);
-        }
-
-        if(data.byLibName.length > 0) {
-            createLibNamesListFrom(shell, input, data.byLibName, 'in_lib_names', false);
-        }
-
-        if(data.byTown.length > 0) {
-            createTownsListFrom(shell, input, data.byTown, 'in_towns', false);
-        }
-      } else {
-        if ((data.byTitle.length > 0) || (data.byAuthor.length > 0) || (data.bySubject.length > 0)) {
-            createListFrom(shell, input, {}, 'The most commonly occurring:', true);
-        }
+        var shell = $('<div/>');
 
         if (data.byTitle.length > 0) {
-            createTitlesListFrom(shell, input, data.byTitle, 'in_titles', false);
+            createListFrom(shell, input, data.byTitle, 'in_titles');
         }
 
         if (data.byAuthor.length > 0) {
-            createAuthorsListFrom(shell, input, data.byAuthor, 'in_authors', false);
+            createListFrom(shell, input, data.byAuthor, 'in_authors');
         }
 
         if (data.bySubject.length > 0) {
-            createSubjectsListFrom(shell, input, data.bySubject, 'in_subjects', false);
+            createListFrom(shell, input, data.bySubject, 'in_subjects');
         }
-      }
 
       $.fn.autocomplete.element.html(shell);
       $.fn.autocomplete.element.find('.item').mousedown(function() {
-        dataLayer.push({
-          'event': 'action.search',
-          'actionContext': {
-            'eventCategory': 'search',
-            'eventAction': 'fulltext',
-            'eventLabel': $(this).attr('data-value'),
-            'eventValue': undefined,
-            'nonInteraction': false
-          }
-        });
-        populate($(this).attr('data-value'), input, {mouse: true}, true, $(this).attr('id'));
+          populate($(this).attr('data-value'), input, {mouse: true});
       });
       align(input, $.fn.autocomplete.element);
     }
@@ -312,19 +236,9 @@
             if (selected.length > 0) {
               event.preventDefault();
               if (event.which === 13 && selected.attr('href')) {
-                dataLayer.push({
-                  'event': 'action.search',
-                  'actionContext': {
-                    'eventCategory': 'search',
-                    'eventAction': 'fulltext',
-                    'eventLabel': selected.attr('data-value'),
-                    'eventValue': undefined,
-                    'nonInteraction': false
-                  }
-                });
                 location.assign(selected.attr('href'));
               } else {
-                populate(selected.attr('data-value'), $(this), element, {key: true});
+                populate(selected.attr('data-value'), element, {key: true});
                 element.find('.item.selected').removeClass('selected');
                 $(this).data('selected', -1);
               }
@@ -398,7 +312,9 @@
       highlight: true,
       loadingString: 'Loading...',
       maxResults: 15,
-      minLength: 3
+      minLength: 3,
+      language: 'cs',
+      autoSubmit: true
     };
     $.fn.autocomplete.ajax = function(ops) {
       if (timer) clearTimeout(timer);

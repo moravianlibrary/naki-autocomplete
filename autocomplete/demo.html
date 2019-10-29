@@ -1,0 +1,77 @@
+<!doctype html>
+
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Autocomplete demo</title>
+  <meta name="description" content="Ukázka použítí modulu pro autocomplete">
+  <meta name="author" content="Josef Moravec">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+      <div class="jumbotron mt-3">
+        <h1>Autocomplete demo</h1>
+        <p class="lead">Ukázka použití našeptávače nad vyhledávačem systému Knihovny.cz</p>
+        <form id="demo" method="get" action="https://www.knihovny.cz/Search/Results" autocomplete="off" class="form-inline">
+          <div class="form-group  mx-sm-3 mb-2">
+            <label for"lookfor" class="sr-only">Hledat:</label>
+            <input id="lookfor" class="form-control" name="lookfor">
+          </div>
+          <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-search"></i> Hledat</button>
+        </form>    
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/f09a743519.js" crossorigin="anonymous"></script>
+<script src="autocomplete.js"></script>
+<script src="autocomplete-knihovny-cz.js"></script>
+<script>
+
+$("#demo #lookfor").autocomplete({
+      maxResults: 5,
+      cache: false,
+      loadingString: 'Nahrávám...',
+      handler: function(query, cb) {
+        var searcher = "Solr";
+        $.fn.autocomplete.ajax({
+          url: 'https://www.knihovny.cz/AJAX/JSON',
+          data: {
+            q:query,
+            filters: 'null',
+            method: 'getACSuggestions',
+          },
+          dataType:'json',
+          success: function(json) {
+            if (json.status == 'OK'
+                && (json.data.byAuthor.length > 0
+                        || json.data.byTitle.length > 0
+                        || json.data.bySubject.length > 0
+                    || json.data.byLibName.length > 0
+                    || json.data.byTown.length > 0
+                )
+            ) {
+              cb(json.data);
+            } else {
+              cb([]);
+            }
+          }
+        });
+      },
+      driver: knihovnyCz,
+      source_url: "https://www.knihovny.cz/AJAX/JSON?method=getACSuggestions&filters=null&q="
+});
+
+
+
+</script>
+</html>

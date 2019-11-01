@@ -10,6 +10,7 @@
   <meta name="author" content="Josef Moravec">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="autocomplete.css">
 </head>
 
 <body>
@@ -41,37 +42,8 @@ $("#demo #lookfor").autocomplete({
       maxResults: 5,
       cache: false,
       loadingString: 'Nahrávám...',
-      handler: function(query, cb) {
-        var searcher = "Solr";
-        $.fn.autocomplete.ajax({
-          url: 'https://www.knihovny.cz/AJAX/JSON',
-          data: {
-            q:query,
-            filters: 'null',
-            method: 'getACSuggestions',
-          },
-          dataType:'json',
-          success: function(json) {
-            if (json.status == 'OK'
-                && (json.data.byAuthor.length > 0
-                        || json.data.byTitle.length > 0
-                        || json.data.bySubject.length > 0
-                    || json.data.byLibName.length > 0
-                    || json.data.byTown.length > 0
-                )
-            ) {
-              cb(json.data);
-            } else {
-              cb([]);
-            }
-          }
-        });
-      },
-      driver: knihovnyCz,
-      source_url: "https://www.knihovny.cz/AJAX/JSON?method=getACSuggestions&filters=null&q="
+      handler: knihovnyCz
 });
-
-
 
 </script>
 </html>

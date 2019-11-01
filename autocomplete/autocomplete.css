@@ -1,0 +1,18 @@
+.autocomplete-results {
+    border: 1px solid grey;
+}
+.autocomplete-results .autocomplete-results-category {
+    font-weight: bold;
+    background-color: crimson;
+    padding: 2px 10px;
+}
+.autocomplete-results .item {
+    background-color: burlywood;
+    padding: 2px 10px;
+}
+.autocomplete-results .item.loading {
+    background-color: transparent;
+}
+.autocomplete-results .item.selected {
+    background-color: coral;
+}

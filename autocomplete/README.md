@@ -4,31 +4,32 @@ This library can be used to build autocomplete on top of external search service
 Example of usage could be seen in file [demo.html](demo.html).
 
 Basically you need to add this to your html/templates:
-
-    <html>
-    <head>
-      <link rel="stylesheet" href="autocomplete.css">
-    </head>
-    <body>
-    <!-- You content here -->
-        <form id="demo" method="get" action="https://www.knihovny.cz/Search/Results" autocomplete="off">
-            <label for"lookfor">Search for:</label>
-            <input id="lookfor" name="lookfor">
-            <button type="submit">Search</button>
-        </form>
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-        <script src="autocomplete.js"></script>
-        <script src="autocomplete-knihovny-cz.js"></script>
-        <script>
-        $("#demo #lookfor").autocomplete({
-            maxResults: 5,
-            cache: false,
-            loadingString: 'Nahrávám...',
-            handler: knihovnyCz
-        });
-        </script>    
-    </body>
-    </html>
+```html
+<html>
+<head>
+    <link rel="stylesheet" href="autocomplete.css">
+</head>
+<body>
+<!-- You content here -->
+    <form id="demo" method="get" action="https://www.knihovny.cz/Search/Results" autocomplete="off">
+        <label for"lookfor">Search for:</label>
+        <input id="lookfor" name="lookfor">
+        <button type="submit">Search</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="autocomplete.js"></script>
+    <script src="autocomplete-knihovny-cz.js"></script>
+    <script>
+    $("#demo #lookfor").autocomplete({
+        maxResults: 5,
+        cache: false,
+        loadingString: 'Nahrávám...',
+        handler: knihovnyCz
+    });
+    </script>    
+</body>
+</html>
+```
 
 ## Customizing your autocomplete
 ### Change style
@@ -43,17 +44,17 @@ There are several classes you can use to customize look and feel of your autocom
 ### Change behaviour
 
 You can change some behaviour by passing options to contructor. Available options are (formatted as `key`:default value):   
-
-    timeout: 200, // ajax timeout
-    cache: true,
-    highlight: true,
-    loadingString: 'Loading...',
-    maxResults: 15,
-    minLength: 3,
-    language: 'cs',
-    autoSubmit: true,
-    handler: 
-    
+```json
+timeout: 200, // ajax timeout
+cache: true,
+highlight: true,
+loadingString: 'Loading...',
+maxResults: 15,
+minLength: 3,
+language: 'cs',
+autoSubmit: true,
+handler: copyHandler 
+```
     
 ## Configuring data source
 Not all search service does return the data for autocomplete in same format. This is the situation, when handler come into play.
@@ -69,41 +70,43 @@ The handler function is called with three parameters:
 3. `callback` - callback function
 
 Data should be formatted as follows:
+```json
+[
+    {
+        'section_name': "Heading for particular section":
+        'items': [
+            {
+                'value': "some value",
+                'label': "some label"
+            },
+            ... more items ...
+        ]
+    },
+    ... more sections ...        
+]
+```
 
-    [
-        {
-            'section_name': "Heading for particular section":
-            'items': [
-                {
-                    'value': "some value",
-                    'label': "some label"
-                },
-                ... more items ...
-            ]
-        },
-        ... more sections ...        
-    ]
-    
 Alternatively, `items` could be array of string, the string is the used as both, `label` and `value`.
 
 So, basic handler could look like this:
-
-    function copyHandler(autocomplete, query, callback) {
-        autocomplete.ajax({
-            url: 'https://search.example.com',
-            data: {
-                q:query,
-                some_param: 'some value',
-            },
-            dataType: 'json',
-            success: function(json) {
-                if (json !== 'undefined') {
-                    callback(data);
-                } else {
-                    callback([]);
-                }
+```javascript
+function copyHandler(autocomplete, query, callback) {
+    autocomplete.ajax({
+        url: 'https://search.example.com',
+        data: {
+            q:query,
+            some_param: 'some value',
+        },
+        dataType: 'json',
+        success: function(json) {
+            if (json !== 'undefined') {
+                callback(data);
+            } else {
+                callback([]);
             }
-        });
-    }
-    
+        }
+    });
+}
+```
+
 Another example of a handle could be find in file [autocomplete-knihovny-cz.js](autocomplete-knihovny-cz.js) which is handler for using on top of autocomplete from [Knihovny.cz](https://www.knihovny.cz) portal.

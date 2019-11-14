@@ -73,7 +73,7 @@ The data should be formatted as follows:
 ```json
 [
     {
-        'section_name': "Heading for particular section":
+        'section_name': "Heading for particular section",
         'items': [
             {
                 'value': "some value",

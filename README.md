@@ -34,7 +34,7 @@ Basically you need to add this to your html/templates:
 ## Customizing your autocomplete
 ### Changing style
 
-There are several classes you can use to customize look and feel of your autocomplete. Example of usage could be found in the  [autocomplete.css](autocomplete.css) file.
+There are several classes you can use to customize look and feel of your autocomplete. Example of usage could be found in the  [autocomplete.css](css/autocomplete/autocomplete.css) file.
 - `autocomplete-results` - whole autocomplete container
 - `autocomplete-results-category` - heading of every section
 - `item` - each suggested item
@@ -109,4 +109,4 @@ function copyHandler(autocomplete, query, callback) {
 }
 ```
 
-Another example of a handle could be found in [autocomplete-knihovny-cz.js](autocomplete-knihovny-cz.js) file which is a handler for using NAKI Autocomplete on top of the autocomplete from [Knihovny.cz](https://www.knihovny.cz) portal.
+Another example of a handle could be found in [autocomplete-knihovny-cz.js](js/autocomplete/autocomplete-knihovny-cz.js) file which is a handler for using NAKI Autocomplete on top of the autocomplete from [Knihovny.cz](https://www.knihovny.cz) portal.

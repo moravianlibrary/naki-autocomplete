@@ -29,7 +29,7 @@
 
 namespace NAKI\Autocomplete;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
  * Autocomplete handler plugin manager

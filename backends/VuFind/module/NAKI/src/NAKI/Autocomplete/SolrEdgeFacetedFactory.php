@@ -30,8 +30,8 @@
 namespace NAKI\Autocomplete;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 
 /**
  * Solr Edge Faceted Autocomplete Module
@@ -44,7 +44,7 @@ use Zend\ServiceManager\Exception\ServiceNotFoundException;
  * @license  https://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:autosuggesters Wiki
  */
-class SolrEdgeFacetedFactory implements \Zend\ServiceManager\Factory\FactoryInterface
+class SolrEdgeFacetedFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
